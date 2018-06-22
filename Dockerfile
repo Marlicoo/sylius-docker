@@ -19,7 +19,7 @@ USER www-data
 RUN composer create-project \
 		sylius/sylius-standard \
 		${SYLIUS_DIR} \
-		${SYLIUS_VERSION} \
+
 	&& chmod +x sylius/bin/console \
 	# Patch Sylius Standard from master (required for version < 1.1) \
 	&& cd sylius \
@@ -29,6 +29,11 @@ RUN composer create-project \
 
 USER root
 
+COPY payments/* ${SYLIUS_DIR}/src/AppBundle/Payments/
+COPY payments_config/config.yml ${SYLIUS_DIR}/app/config/
+COPY payments_config/services.yml ${SYLIUS_DIR}/app/config/
+COPY payments_config/payum.yml ${SYLIUS_DIR}/app/config/
+COPY payments_config/routing.yml ${SYLIUS_DIR}/app/config/
 # entrypoint.d scripts
 COPY entrypoint.d/* /entrypoint.d/
 

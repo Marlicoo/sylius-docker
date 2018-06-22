@@ -1,0 +1,12 @@
+payum:
+    gateways:
+        rbpl:
+            api:
+              options:
+                  pos_id:       test
+                  pos_auth_key: test
+                  sandbox:      false
+            factory: rbpl
+            actions:
+                  - rbpl_plugin.action.capture
+                  - rbpl_plugin.action.status
