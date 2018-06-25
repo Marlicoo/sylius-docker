@@ -68,16 +68,16 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface, Generic
     public function execute($request): void
     {
         RequestNotSupportedException::assertSupports($this, $request);
-
         $details = $request->getModel();
-
+        if (isset($details['status'])) {
+            return;
+        }
         /** @var TokenInterface $token */
         $token = $request->getToken();
-
         $details['merchantId'] = '11';
         $details['redirectUrl'] = $token->getTargetUrl();
         $details['method'] = 'TRANSFER';
-
+        $details['status'] = RbplBridgeInterface::COMPLETED_STATUS;
         $array =  (array) $details;
 
         throw new HttpPostRedirect(

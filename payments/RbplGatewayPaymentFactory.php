@@ -3,6 +3,7 @@
 namespace AppBundle\Payments;
 
 
+use BitBag\SyliusPrzelewy24Plugin\Action\NotifyAction;
 use GuzzleHttp\Client;
 use Payum\Core\Bridge\Spl\ArrayObject;
 use Payum\Core\GatewayFactory;
@@ -21,6 +22,7 @@ class RbplGatewayPaymentFactory extends GatewayFactory
             'payum.action.capture' => new CaptureAction(new RbplBridge(new Client())),
             'payum.action.convert_payment' => new ConvertPaymentAction(),
             'payum.action.status' => new StatusAction(new RbplBridge(new Client())),
+            'payum.action.notify' => new \AppBundle\Payments\NotifyAction(new RbplBridge(new Client())),
 
         ]);
 

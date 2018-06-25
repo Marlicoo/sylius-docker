@@ -42,6 +42,13 @@ services:
         tags:
             - { name: payum.action, factory: rbpl, alias: payum.action.status }
 
+    rbpl_plugin.action.notify:
+        class: AppBundle\Payments\NotifyAction
+        arguments:
+            - "@rbpl_plugin.bridge.rbpl"
+        tags:
+            - { name: payum.action, factory: rbpl, alias: payum.action.notify }
+
     rbpl.form.type.gateway_configuration.rbpl:
         class: AppBundle\Payments\RbplGatewayConfigurationType
         tags:

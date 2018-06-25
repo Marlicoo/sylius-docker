@@ -1,20 +1,32 @@
 <?php
 
+/*
+ * This file has been created by developers from BitBag.
+ * Feel free to contact us once you face any issues or want to start
+ * another great project.
+ * You can find more information about us on https://bitbag.shop and write us
+ * an email on mikolaj.krol@bitbag.pl.
+ */
+
+declare(strict_types=1);
+
 namespace AppBundle\Payments;
 
 
+use AppBundle\Payments\RbplBridgeInterface;
 use Payum\Core\Action\ActionInterface;
 use Payum\Core\ApiAwareInterface;
-
+use Payum\Core\Exception\InvalidArgumentException;
 use Payum\Core\Exception\RequestNotSupportedException;
 use Payum\Core\Exception\UnsupportedApiException;
 use Payum\Core\GatewayAwareInterface;
 use Payum\Core\GatewayAwareTrait;
 use Payum\Core\Request\GetHttpRequest;
-use Payum\Core\Request\GetStatusInterface;
-use Sylius\Component\Core\Model\PaymentInterface;
+use Payum\Core\Request\Notify;
+use Payum\Core\Bridge\Spl\ArrayObject;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-final class StatusAction implements ActionInterface, ApiAwareInterface, GatewayAwareInterface
+final class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayAwareInterface
 {
     use GatewayAwareTrait;
 
@@ -46,24 +58,16 @@ final class StatusAction implements ActionInterface, ApiAwareInterface, GatewayA
     /**
      * {@inheritDoc}
      *
-     * @param GetStatusInterface $request
+     * @param Notify $request
      */
     public function execute($request): void
     {
         RequestNotSupportedException::assertSupports($this, $request);
-        /** @var PaymentInterface $payment */
-        $payment = $request->getModel();
-        $details = $payment->getDetails();
-        if(empty($details)){
-            $this->gateway->execute($httpRequest = new GetHttpRequest());
-        }
-        if (!isset($details['redirectUrl'])) {
-            $request->markNew();
-            return;
-        }
 
+        $details = ArrayObject::ensureArrayObject($request->getModel());
+
+        $this->gateway->execute($httpRequest = new GetHttpRequest());
         $details['status'] = RbplBridgeInterface::COMPLETED_STATUS;
-        $request->markCaptured();
     }
 
     /**
@@ -72,8 +76,8 @@ final class StatusAction implements ActionInterface, ApiAwareInterface, GatewayA
     public function supports($request): bool
     {
         return
-            $request instanceof GetStatusInterface &&
-            $request->getModel() instanceof PaymentInterface
-            ;
+            $request instanceof Notify &&
+            $request->getModel() instanceof \ArrayAccess
+        ;
     }
 }
